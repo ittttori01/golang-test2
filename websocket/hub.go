@@ -39,7 +39,12 @@ func (hub *Hub) run(){
 		
 		case message := <-hub.broadcast:
 			for client := range hub.clients{
-
+				select{
+				case client.send <-message:
+				default:
+					close(client.send)
+					delete(hub.clients, client)
+				}
 			}
 		}
 
